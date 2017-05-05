@@ -13,8 +13,11 @@
     <div class="container">
       <h2>Plot for {{recipe_name}}</h2>
       <div>Image loading may take some time...</div>
-      <!--img src="{{url_for('fig_gen', recipe_name=recipe_name, table_name=table_name)}}" alt="Image Placeholder"-->
-      {{ plot_output }}
+      {% if interactive == true%}
+        {{ plot_output }}
+      {% else %}
+        <img src="{{ url_for('gen_static_plot', recipe=recipe_name, table_name=table_name) }}" alt="Image Placeholder">
+      {% endif %}
     </div>
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
