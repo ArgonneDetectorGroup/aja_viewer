@@ -1,14 +1,17 @@
+import os
 import sqlite3
 import flask
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from io import BytesIO
 
 app = flask.Flask(__name__)
 
 app.config.from_pyfile('config.py')
 
 #This should contain a path to a file
-app.config.from_envvar('AJA_VIEWER_SETTINGS')
+#app.config.from_envvar('AJA_VIEWER_SETTINGS')
 
 DATABASE = app.config['DATABASE']
 app.debug = app.config['DEBUG']
@@ -25,34 +28,42 @@ def index():
     table_names = df['name'].values.tolist()
     return flask.render_template('index.html', table_names = table_names)
 
-@app.route('/recipe_plots', methods=['GET', 'POST'])
-def show_plot():
-    table_name = flask.request.form['table_name']
-    recipe = flask.request.form['submit_plt']
-    base_path = './static/'
-    img_name = recipe.replace('', '_')+'.png'
+@app.route('/fig_gen', methods=['GET'])
+def fig_gen():
+    table_name = flask.request.args.get('table_name', None)
+    recipe = flask.request.args.get('recipe_name', None)
 
     query = """select * from {} where
             Recipe_Steps like ?""".format(table_name)
-
+    
     df = pd.read_sql_query(query, get_db(), params=(recipe,))
 
-    ax = plt.gca()
-    ax.clear()
+    fig, ax = plt.subplots(1)
+
     for key, val in df.groupby(('Layer_#', 'Logfile_Path')):
         val.plot(ax=ax, legend=False)
 
     ax.set_title('Recipe summary for: '+recipe)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Some arbitrary thing')
-    fig = plt.gcf()
 
-    fig.set_size_inches(10, 9)
-    fig.savefig(base_path+img_name)
+    output = BytesIO()
+
+    fig.set_size_inches(8, 6)
+    fig.savefig(output)
+    output.seek(0)
+
+    return flask.send_file(output, mimetype='image/png')
+
+
+@app.route('/recipe_plots', methods=['GET', 'POST'])
+def show_plot():
+    table_name = flask.request.form['table_name']
+    recipe = flask.request.form['submit_plt']
 
     return flask.render_template('show_plots.html',
                                 recipe_name = recipe,
-                                img_name=img_name)
+                                table_name=table_name)
 
 @app.route('/recipe_frequency', methods=['GET', 'POST'])
 def calc_recipe_frequency():
