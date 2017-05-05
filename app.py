@@ -3,6 +3,7 @@ import sqlite3
 import flask
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly as ply
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from io import BytesIO
 
@@ -28,14 +29,15 @@ def index():
     table_names = df['name'].values.tolist()
     return flask.render_template('index.html', table_names = table_names)
 
-@app.route('/fig_gen', methods=['GET'])
-def fig_gen():
-    table_name = flask.request.args.get('table_name', None)
-    recipe = flask.request.args.get('recipe_name', None)
+
+@app.route('/recipe_plots', methods=['GET', 'POST'])
+def show_plot():
+    table_name = flask.request.form['table_name']
+    recipe = flask.request.form['submit_plt']
 
     query = """select * from {} where
             Recipe_Steps like ?""".format(table_name)
-    
+
     df = pd.read_sql_query(query, get_db(), params=(recipe,))
 
     fig, ax = plt.subplots(1)
@@ -43,27 +45,23 @@ def fig_gen():
     for key, val in df.groupby(('Layer_#', 'Logfile_Path')):
         val.plot(ax=ax, legend=False)
 
-    ax.set_title('Recipe summary for: '+recipe)
+    #ax.set_title('Recipe summary for: '+recipe)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Some arbitrary thing')
 
-    output = BytesIO()
-
     fig.set_size_inches(8, 6)
-    fig.savefig(output)
-    output.seek(0)
 
-    return flask.send_file(output, mimetype='image/png')
+    #output = BytesIO()
+    # fig.savefig(output)
+    # output.seek(0)
+    #return flask.send_file(output, mimetype='image/png')
 
-
-@app.route('/recipe_plots', methods=['GET', 'POST'])
-def show_plot():
-    table_name = flask.request.form['table_name']
-    recipe = flask.request.form['submit_plt']
+    output = ply.offline.plot_mpl(fig, output_type='div', show_link="False",include_plotlyjs="False")
 
     return flask.render_template('show_plots.html',
                                 recipe_name = recipe,
-                                table_name=table_name)
+                                table_name=table_name,
+                                plot_output=flask.Markup(output))
 
 @app.route('/recipe_frequency', methods=['GET', 'POST'])
 def calc_recipe_frequency():
