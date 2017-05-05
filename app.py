@@ -5,8 +5,13 @@ import matplotlib.pyplot as plt
 
 app = flask.Flask(__name__)
 
+app.config.from_pyfile('config.py')
 
-DATABASE = '/Users/fcarter/Desktop/AJA/LogsDB.db'
+#This should contain a path to a file
+app.config.from_envvar('AJA_VIEWER_SETTINGS')
+
+DATABASE = app.config['DATABASE']
+app.debug = app.config['DEBUG']
 
 def get_db():
     db = getattr(flask.g, '_database', None)

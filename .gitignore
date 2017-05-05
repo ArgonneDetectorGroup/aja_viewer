@@ -14,3 +14,6 @@ dist
 
 #Images
 *.png
+
+#The giant database I use for testing
+*.db
