@@ -17,3 +17,6 @@ dist
 
 #The giant database I use for testing
 *.db
+
+#The configuration file
+config.py
