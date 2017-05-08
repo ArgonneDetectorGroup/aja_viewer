@@ -137,7 +137,7 @@ def calc_recipe_frequency():
                group by Recipe_Steps
                order by count desc
                """
-    elif table_name == 'AJA_Metals'
+    elif table_name == 'AJA_Metals':
 
         query = """select Recipe_Steps, count(Recipe_Steps) as count from
                (select distinct Recipe_Steps, Job_Name, "Layer_#"
@@ -155,7 +155,7 @@ def calc_recipe_frequency():
                """
     else:
         raise Exception("Unknown Table")
-        
+
     df = pd.read_sql_query(query, get_db())
 
     df_head = df.columns.tolist()
