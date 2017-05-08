@@ -66,7 +66,6 @@ def gen_timeseries(db, table_name, recipe):
         ax.set_xlabel('Time (s)')
 
     fig.tight_layout()
-    fig.savefig('figure.png')
 
     return fig
 
@@ -123,20 +122,40 @@ def show_plot():
 def calc_recipe_frequency():
     table_name = flask.request.form['table_name']
 
-    query = """select Recipe_Steps, count(Recipe_Steps) as count from
-           (select distinct Recipe_Steps, Job_Name, "Layer_#"
-           from {}
-           where ("RF#1_Shutter" like "OPEN"
-           OR "RF#2_Shutter" like "OPEN"
-           OR "DC#1_Shutter" like "OPEN"
-           OR "DC#5A_Shutter" like "OPEN"
-           OR "DC#5B_Shutter" like "OPEN"
-           OR "DC#5C_Shutter" like "OPEN"
-           OR "DC#5D_Shutter" like "OPEN")
-           AND Recipe_Steps not like "%OFF") as internalquery
-           group by Recipe_Steps
-           order by count desc
-           """.format(table_name)
+    if table_name == 'AJA_Dielectrics':
+
+        query = """select Recipe_Steps, count(Recipe_Steps) as count from
+               (select distinct Recipe_Steps, Job_Name, "Layer_#"
+               from AJA_Dielectrics
+               where ("RF#1_Shutter" like "OPEN"
+               OR "RF#4A_Shutter" like "OPEN"
+               OR "RF#4B_Shutter" like "OPEN"
+               OR "RF#4C_Shutter" like "OPEN"
+               OR "DC#1_Shutter" like "OPEN"
+               OR "DC#5C_Shutter" like "OPEN")
+               AND Recipe_Steps not like "%TURNOFF%") as internalquery
+               group by Recipe_Steps
+               order by count desc
+               """
+    elif table_name == 'AJA_Metals'
+
+        query = """select Recipe_Steps, count(Recipe_Steps) as count from
+               (select distinct Recipe_Steps, Job_Name, "Layer_#"
+               from AJA_Metals
+               where ("RF#1_Shutter" like "OPEN"
+               OR "RF#2_Shutter" like "OPEN"
+               OR "DC#1_Shutter" like "OPEN"
+               OR "DC#5A_Shutter" like "OPEN"
+               OR "DC#5B_Shutter" like "OPEN"
+               OR "DC#5C_Shutter" like "OPEN"
+               OR "DC#5D_Shutter" like "OPEN")
+               AND Recipe_Steps not like "%OFF") as internalquery
+               group by Recipe_Steps
+               order by count desc
+               """
+    else:
+        raise Exception("Unknown Table")
+        
     df = pd.read_sql_query(query, get_db())
 
     df_head = df.columns.tolist()
