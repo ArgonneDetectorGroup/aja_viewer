@@ -16,7 +16,7 @@
       {% if interactive == true%}
         {{ plot_output }}
       {% else %}
-        <img src="{{ path_prefix ~ url_for('gen_static_plot', recipe=recipe_name, table_name=table_name) }}" alt="Image Placeholder">
+        <img src="{{ url_for('gen_static_plot', recipe=recipe_name, table_name=table_name) }}" alt="Image Placeholder">
       {% endif %}
     </div>
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
