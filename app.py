@@ -13,13 +13,28 @@ from io import BytesIO
 
 app = flask.Flask(__name__)
 
-app.config.from_pyfile('config.py')
+#Try to load from local user config file
+#If that doesn't exist, use the default
+try:
+    app.config.from_pyfile('config.py')
+except IOError:
+    app.config.from_pyfile('config_default.py')
 
-#This should contain a path to a file
-#app.config.from_envvar('AJA_VIEWER_SETTINGS')
-
+#Locatio of database
 DATABASE = app.config['DATABASE']
+
+#Set the debug level
 app.debug = app.config['DEBUG']
+
+#Allow a custom path prefix for deploying into a subdirectory
+#while using CGI on a server that won't let you edit the Apache
+#configuration files
+PATH_PREFIX = app.config['PREFIX']
+
+#Make a wrapper that always passes the path_prefix to the templates
+#so it makes calls a little cleaner
+def render_template_prefix(template, **kwargs):
+    return flask.render_template(template, path_prefix=PATH_PREFIX, **kwargs)
 
 def get_db():
     db = getattr(flask.g, '_database', None)
@@ -73,7 +88,7 @@ def gen_timeseries(db, table_name, recipe):
 def index():
     df = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table'", get_db())
     table_names = df['name'].values.tolist()
-    return flask.render_template('index.html', table_names = table_names)
+    return render_template_prefix('index.html', table_names = table_names)
 
 @app.route('/static_plot', methods=['GET', 'POST'])
 def gen_static_plot():
@@ -106,14 +121,14 @@ def show_plot():
         #Wrap in fancy interactive plotly div
         output = ply.offline.plot_mpl(fig, output_type='div', show_link="False",include_plotlyjs="False")
 
-        return flask.render_template('show_plots.html',
+        return render_template_prefix('show_plots.html',
                                     interactive=True,
                                     recipe_name = recipe,
                                     table_name=table_name,
                                     plot_output=flask.Markup(output))
 
     else:
-        return flask.render_template('show_plots.html',
+        return render_template_prefix('show_plots.html',
                                     interactive=False,
                                     recipe_name = recipe,
                                     table_name=table_name)
@@ -161,7 +176,7 @@ def calc_recipe_frequency():
     df_head = df.columns.tolist()
     df_data = df.values.tolist()
 
-    return flask.render_template('recipe_freqs.html',
+    return render_template_prefix('recipe_freqs.html',
                                  df_head = df_head,
                                  df_data = df_data,
                                  table_name = table_name)

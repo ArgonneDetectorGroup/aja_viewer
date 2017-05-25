@@ -12,7 +12,7 @@
   <body>
     <div class="container">
       <h2>Available tables in AJA logs database</h2>
-      <form role="form" method='POST' action='/recipe_frequency'>
+      <form role="form" method='POST' action={{path_prefix ~ '/recipe_frequency'}}>
         {% for name in table_names %}
           <button type="sumbit" class="btn btn-info" name="table_name" value="{{name}}">{{name}}</button>
         {% endfor %}
