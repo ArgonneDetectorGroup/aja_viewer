@@ -64,14 +64,6 @@ def gen_timeseries(db, table_name, recipe):
             yvals = filtered_val[key].values[:]
             xvals = (filtered_val.index-filtered_val.index[0]).total_seconds()[:]
 
-            print(int(len(yvals/100)))
-
-            # #only want at most 100 point per time trace for size reasons
-            # if len(yvals)  > 100:
-            #     interval = int(len(yvals/100))
-            #     yvals = yvals[::interval]
-            #     xvals = xvals[::interval]
-
             axes[ix].plot(xvals, yvals, label=str(filtered_val.index[0]))
 
     fig.canvas.draw()
