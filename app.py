@@ -26,16 +26,6 @@ DATABASE = app.config['DATABASE']
 #Set the debug level
 app.debug = app.config['DEBUG']
 
-#Allow a custom path prefix for deploying into a subdirectory
-#while using CGI on a server that won't let you edit the Apache
-#configuration files
-PATH_PREFIX = app.config['PREFIX']
-
-#Make a wrapper that always passes the path_prefix to the templates
-#so it makes calls a little cleaner
-def render_template_prefix(template, **kwargs):
-    return flask.render_template(template, path_prefix=PATH_PREFIX, **kwargs)
-
 def get_db():
     db = getattr(flask.g, '_database', None)
     if db is None:
@@ -71,8 +61,17 @@ def gen_timeseries(db, table_name, recipe):
 
         for ix, key in enumerate(keys_to_plot):
 
-            yvals = filtered_val[key].values
-            xvals = (filtered_val.index-filtered_val.index[0]).total_seconds()
+            yvals = filtered_val[key].values[:]
+            xvals = (filtered_val.index-filtered_val.index[0]).total_seconds()[:]
+
+            print(int(len(yvals/100)))
+
+            # #only want at most 100 point per time trace for size reasons
+            # if len(yvals)  > 100:
+            #     interval = int(len(yvals/100))
+            #     yvals = yvals[::interval]
+            #     xvals = xvals[::interval]
+
             axes[ix].plot(xvals, yvals, label=str(filtered_val.index[0]))
 
     fig.canvas.draw()
@@ -88,7 +87,7 @@ def gen_timeseries(db, table_name, recipe):
 def index():
     df = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table'", get_db())
     table_names = df['name'].values.tolist()
-    return render_template_prefix('index.html', table_names = table_names)
+    return flask.render_template('index.html', table_names = table_names)
 
 @app.route('/static_plot', methods=['GET', 'POST'])
 def gen_static_plot():
@@ -98,15 +97,10 @@ def gen_static_plot():
     fig = gen_timeseries(get_db(), table_name, recipe)
 
     output = BytesIO()
-    # canvas.print_png(output)
-    # response=flask.make_response(output.getvalue())
-    # response.headers['Content-Type'] = 'image/png'
 
     fig.savefig(output)
     output.seek(0)
     return flask.send_file(output, mimetype='image/png')
-
-    return response
 
 @app.route('/recipe_plots', methods=['GET', 'POST'])
 def show_plot():
@@ -121,14 +115,14 @@ def show_plot():
         #Wrap in fancy interactive plotly div
         output = ply.offline.plot_mpl(fig, output_type='div', show_link="False",include_plotlyjs="False")
 
-        return render_template_prefix('show_plots.html',
+        return flask.render_template('show_plots.html',
                                     interactive=True,
                                     recipe_name = recipe,
                                     table_name=table_name,
                                     plot_output=flask.Markup(output))
 
     else:
-        return render_template_prefix('show_plots.html',
+        return flask.render_template('show_plots.html',
                                     interactive=False,
                                     recipe_name = recipe,
                                     table_name=table_name)
@@ -176,7 +170,7 @@ def calc_recipe_frequency():
     df_head = df.columns.tolist()
     df_data = df.values.tolist()
 
-    return render_template_prefix('recipe_freqs.html',
+    return flask.render_template('recipe_freqs.html',
                                  df_head = df_head,
                                  df_data = df_data,
                                  table_name = table_name)

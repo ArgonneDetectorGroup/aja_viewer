@@ -29,14 +29,14 @@
               <td>{{col_data}}</td>
             {% endfor %}
             <td>
-              <form role="form" method='POST' action={{path_prefix ~ '/recipe_plots'}}>
+              <form role="form" method='POST' action={{url_for('show_plot')}}>
                 <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{row[0]}}">Static</button>
                 <input type="hidden" name="table_name" value="{{table_name}}"/>
                 <input type="hidden" name="interactive" value="{{false}}"/>
               </form>
             </td>
             <td>
-              <form role="form" method='POST' action={{path_prefix ~ '/recipe_plots'}}>
+              <form role="form" method='POST' action={{url_for('show_plot')}}>
                 <button type="sumbit" class="btn btn-warning" name="submit_plt" value="{{row[0]}}">Interactive</button>
                 <input type="hidden" name="table_name" value="{{table_name}}"/>
                 <input type="hidden" name="interactive" value="{{true}}"/>
