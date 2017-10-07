@@ -11,10 +11,11 @@
   </head>
   <body>
     <div class="container">
-      <h2>Available tables in AJA logs database</h2>
-      <form role="form" method='POST' action={{url_for('calc_recipe_frequency')}}>
-        {% for name in table_names %}
-          <button type="sumbit" class="btn btn-info" name="table_name" value="{{name}}">{{name}}</button>
+      <h2>Available AJA machine logs</h2>
+      <div>Currently only plotting metals logs is supported, but listing of recent dielectrics logs works.</div>
+      <form role="form" method='POST' action={{url_for('display_jobs')}}>
+        {% for name in machine_names %}
+          <button type="sumbit" class="btn btn-info" name="machine_name" value="{{name}}">{{name}}</button>
         {% endfor %}
       </form>
     </div>

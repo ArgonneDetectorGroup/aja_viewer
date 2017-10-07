@@ -7,40 +7,28 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <title>Recipe frequency</title>
+    <title>{{machine_name}} Jobs</title>
   </head>
   <body>
     <div class="container">
-      <h2>Recipe steps by frequency</h2>
-      <div>The count column is how many logfiles there are that match this recipe</div>
-      <div class='text-danger'>Warning: Interactive plots can take a long time to generate</div>
+      <h2>Jobs listed in order of most recent</h2>
       <table class="table table-striped table-condensed">
         <thead>
           <tr>
-            {% for col_name in df_head %}
-              <th>{{col_name}}</th>
-            {% endfor %}
-            <th colspan=2><center>Show plots</center></th>
+            <th>Date</th>
+            <th>Job Name</th>
+            <th><center>Show plots</center></th>
           </tr>
         </thead>
         <tbody>
-          {% for row in df_data %}
+          {% for log in logs %}
           <tr>
-            {% for col_data in row %}
-              <td>{{col_data}}</td>
-            {% endfor %}
+            <td>{{log['datetime']}}</td>
+            <td>{{log['job']}}</td>
             <td>
               <form role="form" method='POST' action={{url_for('show_plot')}}>
-                <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{row[0]}}">Static</button>
-                <input type="hidden" name="table_name" value="{{table_name}}"/>
-                <input type="hidden" name="interactive" value="{{false}}"/>
-              </form>
-            </td>
-            <td>
-              <form role="form" method='POST' action={{url_for('show_plot')}}>
-                <button type="sumbit" class="btn btn-warning" name="submit_plt" value="{{row[0]}}">Interactive</button>
-                <input type="hidden" name="table_name" value="{{table_name}}"/>
-                <input type="hidden" name="interactive" value="{{true}}"/>
+                <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{loop.index0}}">Static</button>
+                <input type="hidden" name="machine_name" value="{{machine_name}}"/>
               </form>
             </td>
           </tr>
