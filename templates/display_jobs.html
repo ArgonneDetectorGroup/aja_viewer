@@ -18,6 +18,7 @@
             <th>Date</th>
             <th>Job Name</th>
             <th><center>Show plots</center></th>
+            <th><center>Download logfile</center></th>
           </tr>
         </thead>
         <tbody>
@@ -31,6 +32,8 @@
                 <input type="hidden" name="machine_name" value="{{machine_name}}"/>
               </form>
             </td>
+            <td>
+              <a href="{{url_for('download_file', machine_name=machine_name, index=loop.index0)}}" download><button class="btn btn-info">Download</button></a>
           </tr>
           {% endfor %}
         </tbody>

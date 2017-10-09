@@ -1,4 +1,5 @@
 from __future__ import division
+import os
 
 import flask
 from io import BytesIO
@@ -50,6 +51,19 @@ def gen_static_plot():
     fig.savefig(output)
     output.seek(0)
     return flask.send_file(output, mimetype='image/png')
+
+@app.route('/download_file', methods=['GET', 'POST'])
+def download_file():
+    machine_name = flask.request.args['machine_name']
+    index = int(flask.request.args['index'])
+    global LOGS
+
+    path = LOGS[index]['path']
+    basename = os.path.basename(path)
+
+    return flask.send_file(path,
+                            as_attachment=True,
+                            attachment_filename=basename)
 
 @app.route('/show_plot', methods=['GET', 'POST'])
 def show_plot():
