@@ -42,9 +42,10 @@ def display_jobs():
 def gen_static_plot():
     machine_name = flask.request.args['machine_name']
     index = int(flask.request.args['index'])
+    xmult = float(flask.request.args.get('xmult', 1.0))
     global LOGS
 
-    fig = aja.plot_log(LOGS[index]['path'], machine_name, show_layers=True)
+    fig = aja.plot_log(LOGS[index]['path'], machine_name, figsize_xmult=xmult, show_layers=True)
 
     output = BytesIO()
 
@@ -70,6 +71,7 @@ def show_plot():
     machine_name = flask.request.form['machine_name']
     #Why does jinja do 1-indexing?????
     index = int(flask.request.form['submit_plt'])
+    xmult = float(flask.request.form.get('xmult', 1.0))
     global LOGS
     job = LOGS[index]['job']
     recipe_list = LOGS[index]['recipe']
@@ -78,4 +80,5 @@ def show_plot():
                                     recipes = recipe_list,
                                     job=job,
                                     index=index,
-                                    machine_name=machine_name)
+                                    machine_name=machine_name,
+                                    xmult = xmult)

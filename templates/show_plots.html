@@ -14,7 +14,12 @@
       <h2>Plot for:</h2>
       <div>{{job}}</div>
       <div>Image loading may take some time...</div>
-      <img src="{{ url_for('gen_static_plot', index=index, machine_name=machine_name) }}" alt="Image Placeholder", height="600">
+      <img src="{{ url_for('gen_static_plot', index=index, machine_name=machine_name, xmult=xmult) }}" alt="Image Placeholder", height="600">
+      <form role="form" method='POST' action={{url_for('show_plot')}}>
+        <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{index}}">Replot with original width multiplied by:</button>
+        <input type="hidden" name="machine_name" value="{{machine_name}}"/>
+        <input type="text" name="xmult" value="1"/>
+      </form>
     </div>
     <div class="container">
       <table class="table table-striped table-condensed">
