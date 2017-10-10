@@ -75,6 +75,8 @@ def show_plot():
     global LOGS
     job = LOGS[index]['job']
     recipe_list = LOGS[index]['recipe']
+    if recipe_list is None:
+        recipe_list = ['Recipe missing']
 
     return flask.render_template('show_plots.html',
                                     recipes = recipe_list,

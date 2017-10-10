@@ -28,7 +28,7 @@
             <td>{{log['job']}}</td>
             <td>
               <form role="form" method='POST' action={{url_for('show_plot')}}>
-                <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{loop.index0}}">Static</button>
+                <button type="sumbit" class="btn btn-info" name="submit_plt" value="{{loop.index0}}">Show</button>
                 <input type="hidden" name="machine_name" value="{{machine_name}}"/>
               </form>
             </td>
