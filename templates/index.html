@@ -12,7 +12,7 @@
   <body>
     <div class="container">
       <h2>Available AJA machine logs</h2>
-      <div>Currently only plotting metals logs is supported, but listing of recent dielectrics logs works.</div>
+      <div>Click on a machine name to view a list of logfiles in order of most recent. From there you can plot or download the logfiles.</div>
       <form role="form" method='POST' action={{url_for('display_jobs')}}>
         {% for name in machine_names %}
           <button type="sumbit" class="btn btn-info" name="machine_name" value="{{name}}">{{name}}</button>
